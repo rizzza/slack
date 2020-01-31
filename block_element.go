@@ -17,6 +17,12 @@ const (
 	OptTypeUser          string = "users_select"
 	OptTypeConversations string = "conversations_select"
 	OptTypeChannels      string = "channels_select"
+
+	OptTypeMultiStatic        string = "multi_static_select"
+	OptTypeMultiExternal      string = "multi_external_select"
+	OptTypeMultiUser          string = "multi_users_select"
+	OptTypeMultiConversations string = "multi_conversations_select"
+	OptTypeMultiChannels      string = "multi_channels_select"
 )
 
 type MessageElementType string
@@ -32,11 +38,12 @@ type MixedElement interface {
 }
 
 type Accessory struct {
-	ImageElement      *ImageBlockElement
-	ButtonElement     *ButtonBlockElement
-	OverflowElement   *OverflowBlockElement
-	DatePickerElement *DatePickerBlockElement
-	SelectElement     *SelectBlockElement
+	ImageElement       *ImageBlockElement
+	ButtonElement      *ButtonBlockElement
+	OverflowElement    *OverflowBlockElement
+	DatePickerElement  *DatePickerBlockElement
+	SelectElement      *SelectBlockElement
+	MultiSelectElement *MultiSelectBlockElement
 }
 
 // NewAccessory returns a new Accessory for a given block element
@@ -52,6 +59,8 @@ func NewAccessory(element BlockElement) *Accessory {
 		return &Accessory{DatePickerElement: element.(*DatePickerBlockElement)}
 	case *SelectBlockElement:
 		return &Accessory{SelectElement: element.(*SelectBlockElement)}
+	case *MultiSelectBlockElement:
+		return &Accessory{MultiSelectElement: element.(*MultiSelectBlockElement)}
 	}
 
 	return nil
@@ -168,6 +177,32 @@ func NewOptionsSelectBlockElement(optType string, placeholder *TextBlockObject, 
 		Options:     options,
 	}
 }
+
+// MultiSelectBlockElement defines the multi select menu, with a static list
+// of options passed in when defining the element.
+//
+// More Information: https://api.slack.com/reference/block-kit/block-elements#multi_select
+type MultiSelectBlockElement struct {
+	Type                 string                    `json:"type,omitempty"`
+	Placeholder          *TextBlockObject          `json:"placeholder,omitempty"`
+	ActionID             string                    `json:"action_id,omitempty"`
+	Options              []*OptionBlockObject      `json:"options,omitempty"`
+	OptionGroups         []*OptionGroupBlockObject `json:"option_groups,omitempty"`
+	InitialOptions       []*OptionBlockObject      `json:"initial_options,omitempty"`
+	InitialUsers         []string                  `json:"initial_user,omitempty"`
+	InitialConversations []string                  `json:"initial_conversation,omitempty"`
+	InitialChannels      []string                  `json:"initial_channel,omitempty"`
+	MaxSelectedItems     int                       `json:"max_selected_items,omitempty"`
+	MinQueryLength       int                       `json:"min_query_length,omitempty"`
+	Confirm              *ConfirmationBlockObject  `json:"confirm,omitempty"`
+}
+
+// ElementType returns the type of the Element
+func (s MultiSelectBlockElement) ElementType() MessageElementType {
+	return MessageElementType(s.Type)
+}
+
+// TODO: @rizzza - New...
 
 // NewOptionsGroupSelectBlockElement returns a new instance of SelectBlockElement for use with
 // the Options object only.

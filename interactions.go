@@ -20,6 +20,7 @@ type action interface {
 const (
 	InteractionTypeDialogCancellation = InteractionType("dialog_cancellation")
 	InteractionTypeDialogSubmission   = InteractionType("dialog_submission")
+	InteractionTypeViewSubmission     = InteractionType("view_submission")
 	InteractionTypeDialogSuggestion   = InteractionType("dialog_suggestion")
 	InteractionTypeInteractionMessage = InteractionType("interactive_message")
 	InteractionTypeMessageAction      = InteractionType("message_action")
@@ -45,6 +46,16 @@ type InteractionCallback struct {
 	AttachmentID    string          `json:"attachment_id"`
 	ActionCallback  ActionCallbacks `json:"actions"`
 	DialogSubmissionCallback
+}
+
+// ViewInteractionCallback is sent from slack when a user submits a view_submission.
+type ViewInteractionCallback struct {
+	Type      InteractionType `json:"type"`
+	Token     string          `json:"token"`
+	TriggerID string          `json:"trigger_id"`
+	Team      Team            `json:"team"`
+	User      User            `json:"user"`
+	View      View            `json:"view"`
 }
 
 // ActionCallback is a convenience struct defined to allow dynamic unmarshalling of
